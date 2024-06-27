@@ -1,4 +1,4 @@
-# Uncomment this to pass the first stage
+
 import socket
 
 
@@ -16,6 +16,8 @@ def main():
     elif 'echo' in request[1]:
         endpoint=request[1].split('/')[2]
         response=f'HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {len(endpoint)}\r\n\r\n{endpoint}'.encode()
+    elif 'user-agent' in request[1]:
+        response=f'HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {len(data[2].split(' ')[1])}\r\n\r\n{data[2].split(' ')[1]}'.encode()
     conn.sendall(response)
 
 if __name__ == "__main__":
