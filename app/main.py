@@ -13,10 +13,10 @@ def connection_handler(conn,address):
     elif 'user-agent' in request[1]:
         response=f'HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {len(data[2].split(' ')[1])}\r\n\r\n{data[2].split(' ')[1]}'
     elif 'POST' in request[0] and 'files' in request[1]:
-        print(request)
+        print(data)
         try:
             with open(f'/{sys.argv[2]}/{request[1].split('/')[2]}','w') as f:
-                file_contents=f.write()
+                file_contents=f.write(data[-1])
                 response=f'HTTP/1.1 201 Created\r\n\r\n'
         except Exception as e:
             print(e)
