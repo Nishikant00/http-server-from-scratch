@@ -10,10 +10,14 @@ def connection_handler(conn,address):
     elif 'echo' in request[1]:
         endpoint=request[1].split('/')[2]
         response=f'HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {len(endpoint)}\r\n\r\n{endpoint}'
+        if 'Accept-Encoding' in data[2]:
+            if 'invalid-encoding' in data[2]:
+                response=f'HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\n'
+            else:
+                response=f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Encoding: gzip\r\n\r\n"   
     elif 'user-agent' in request[1]:
         response=f'HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {len(data[2].split(' ')[1])}\r\n\r\n{data[2].split(' ')[1]}'
     elif 'POST' in request[0] and 'files' in request[1]:
-        print(data)
         try:
             with open(f'/{sys.argv[2]}/{request[1].split('/')[2]}','w') as f:
                 file_contents=f.write(data[-1])
