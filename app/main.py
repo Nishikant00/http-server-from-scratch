@@ -11,10 +11,13 @@ def connection_handler(conn,address):
         endpoint=request[1].split('/')[2]
         response=f'HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {len(endpoint)}\r\n\r\n{endpoint}'
         if 'Accept-Encoding' in data[2]:
-            if 'invalid-encoding' in data[2]:
-                response=f'HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\n'
-            else:
-                response=f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Encoding: gzip\r\n\r\n"   
+            compression_req=data[2].split(",")
+            for i in compression_req:
+                if 'encoding' in i:
+                    response=f'HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\n'
+                else:
+                    response=f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Encoding: gzip\r\n\r\n" 
+                    break  
     elif 'user-agent' in request[1]:
         response=f'HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {len(data[2].split(' ')[1])}\r\n\r\n{data[2].split(' ')[1]}'
     elif 'POST' in request[0] and 'files' in request[1]:
