@@ -1,6 +1,7 @@
 import socket
 import threading
 import sys
+import gzip
 def connection_handler(conn,address):
     data=conn.recv(4096).decode().split('\r\n')
     request=data[0].split(' ')
@@ -16,7 +17,13 @@ def connection_handler(conn,address):
                 if 'encoding' in i:
                     response=f'HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\n'
                 else:
-                    response=f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Encoding: gzip\r\n\r\n" 
+                    
+                    body=request[1].split('/')[2].encode()
+                    compressed_data=gzip.compress(body)
+                    print(data)
+                    print(request[1].split('/')[2])
+                    print(compressed_data)
+                    response=f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {len(compressed_data)}\r\nContent-Encoding: gzip\r\n\r\n".encode()+compressed_data
                     break  
     elif 'user-agent' in request[1]:
         response=f'HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {len(data[2].split(' ')[1])}\r\n\r\n{data[2].split(' ')[1]}'
@@ -34,7 +41,10 @@ def connection_handler(conn,address):
                 response=f'HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length:{len(file_contents)}\r\n\r\n{file_contents}'
         except Exception as e:
             print(e)
-    conn.sendall(response.encode())
+    try:
+        conn.sendall(response.encode())
+    except AttributeError as e:
+        conn.sendall(response)
     conn.close()
 
 def main():
